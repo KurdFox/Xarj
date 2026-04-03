@@ -1,0 +1,141 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users/{userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - displayName: string
+    //   - email: string (required, format: email)
+    //   - photoURL: string
+    //   - preferredCurrency: string (enum: ["IQD"])
+    //
+    // Collection: users/{userId}/transactions/{transactionId}
+    // Fields:
+    //   - userId: string (required)
+    //   - type: string (required, enum: ["income", "expense"])
+    //   - amount: number (required)
+    //   - currency: string (required, enum: ["IQD"])
+    //   - category: string
+    //   - note: string
+    //   - date: timestamp (required)
+    //   - receiptUrl: string
+    //
+    // Collection: users/{userId}/debts/{debtId}
+    // Fields:
+    //   - userId: string (required)
+    //   - personName: string (required)
+    //   - amount: number (required)
+    //   - currency: string (required, enum: ["IQD"])
+    //   - type: string (required, enum: ["lent", "borrowed"])
+    //   - status: string (required, enum: ["pending", "paid"])
+    //   - date: timestamp (required)
+    //   - note: string
+    //
+    // Collection: users/{userId}/savings/{savingId}
+    // Fields:
+    //   - userId: string (required)
+    //   - goalName: string (required)
+    //   - targetAmount: number (required)
+    //   - currentAmount: number (required)
+    //   - currency: string (required, enum: ["IQD"])
+    //   - deadline: timestamp
+    //   - icon: string
+    //   - note: string
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             (data.preferredCurrency in ["IQD"] || !("preferredCurrency" in data));
+    }
+
+    function isValidTransaction(data, userId) {
+      return data.userId == userId &&
+             data.type in ["income", "expense"] &&
+             data.amount is number && data.amount >= 0 &&
+             data.currency in ["IQD"] &&
+             data.date is timestamp;
+    }
+
+    function isValidDebt(data, userId) {
+      return data.userId == userId &&
+             data.personName is string && data.personName.size() > 0 &&
+             data.amount is number && data.amount >= 0 &&
+             data.currency in ["IQD"] &&
+             data.type in ["lent", "borrowed"] &&
+             data.status in ["pending", "paid"] &&
+             data.date is timestamp;
+    }
+
+    function isValidSavingGoal(data, userId) {
+      return data.userId == userId &&
+             data.goalName is string && data.goalName.size() > 0 &&
+             data.targetAmount is number && data.targetAmount >= 0 &&
+             data.currentAmount is number && data.currentAmount >= 0 &&
+             data.currency in ["IQD"] &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+
+      match /transactions/{transactionId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTransaction(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidTransaction(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /debts/{debtId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidDebt(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidDebt(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /savings/{savingId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSavingGoal(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidSavingGoal(request.resource.data, userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

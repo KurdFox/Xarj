@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@variant dark (.dark &);
+
+@layer base {
+  html {
+    @apply transition-colors duration-300;
+  }
+  html.dark {
+    background-color: #030712; /* gray-950 */
+    color: white;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-transparent;
+  }
+}
