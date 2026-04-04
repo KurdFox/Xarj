@@ -19,7 +19,8 @@ export default function Support() {
             <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center mx-auto shadow-sm">
               <CreditCard className="w-6 h-6 text-pink-600 dark:text-pink-400" />
             </div>
-            <h4 className="font-bold text-pink-700 dark:text-pink-400">فاستپەی (FastPay)</h4>
+            <h4 className="font-bold text-pink-700 dark:text-pink-400">FastPay</h4>
+            <p className="text-sm text-pink-600/70 dark:text-pink-400/60">فاستپەی</p>
           </div>
           
           <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30 text-center space-y-3">

@@ -189,7 +189,7 @@ export default function App() {
               <Wallet className="w-10 h-10 text-white transform -rotate-12" />
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2 font-sans tracking-tight">XARJ - خەرج</h1>
-            <p className="text-gray-500 dark:text-gray-400 font-sans">بەڕێوەبەری دارایی و پاشەکەوتەکانت بە شێوەیەکی ئاسان</p>
+            <p className="text-gray-500 dark:text-gray-400 font-sans">دارایی و پاشەکەوتەکانت بەڕێوە ببە بە شێوەیەکی ئاسان</p>
           </div>
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
