@@ -8,7 +8,7 @@ import { auth, db, signInWithGoogle, logout, handleFirestoreError, OperationType
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { UserProfile, Currency } from './types';
-import { Layout, Wallet, Coins, HandCoins, LogOut, RefreshCw, Menu, X, TrendingUp, TrendingDown, Settings as SettingsIcon, Moon, Sun, Heart, User, Lock, Phone as PhoneIcon, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Layout, Wallet, Coins, HandCoins, LogOut, RefreshCw, Menu, X, TrendingUp, TrendingDown, Settings as SettingsIcon, Moon, Sun, Heart, User, Lock, Phone as PhoneIcon, AlertCircle, Eye, EyeOff, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
 
@@ -19,12 +19,13 @@ import Transactions from './components/Transactions';
 import Debts from './components/Debts';
 import Settings from './components/Settings';
 import Support from './components/Support';
+import DownloadApp from './components/DownloadApp';
 
 export default function App() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'savings' | 'expenses' | 'income' | 'debts' | 'settings' | 'support'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'savings' | 'expenses' | 'income' | 'debts' | 'settings' | 'support' | 'download'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -332,6 +333,7 @@ export default function App() {
     { id: 'debts', label: 'قەرزەکان', icon: HandCoins },
     { id: 'settings', label: 'ڕێکخستنەکان', icon: SettingsIcon },
     { id: 'support', label: 'پشتگیری و دەربارە', icon: Heart },
+    { id: 'download', label: 'دابەزاندن', icon: Download },
   ];
 
   return (
@@ -525,6 +527,7 @@ export default function App() {
                 {activeTab === 'debts' && <Debts profile={profile} />}
                 {activeTab === 'settings' && <Settings profile={profile} />}
                 {activeTab === 'support' && <Support />}
+                {activeTab === 'download' && <DownloadApp />}
               </>
             )}
           </motion.div>
